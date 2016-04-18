@@ -17,6 +17,7 @@ public class SmashHitCommand implements CommandExecutor {
 		switch( subcmd.toLowerCase() ) {
 			case "reload":
 				plugin.reload();
+				/* You can pry these section symbols from my cold, dead hands */
 				sender.sendMessage("§aSmashHit §2» §7Reloaded");
 			return true;
 
