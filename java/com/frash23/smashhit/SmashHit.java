@@ -15,16 +15,11 @@ public class SmashHit extends JavaPlugin implements Listener {
 	private SmashHitDebugListener debugListener = null;
 	private AsyncListenerHandler hitListenerHandler;
 	private ProtocolManager pmgr;
-	private WorldGuardCache wgCache = null;
 
 	@Override
 	public void onEnable() {
 		instance = this;
 		pmgr = ProtocolLibrary.getProtocolManager();
-
-		if( getServer().getPluginManager().getPlugin("WorldGuard") != null ) {
-			wgCache = new WorldGuardCache(this);
-		}
 
 		getCommand("smashhit").setExecutor( new SmashHitCommand(this) );
 		reload();
@@ -34,7 +29,6 @@ public class SmashHit extends JavaPlugin implements Listener {
 	public void onDisable() {
 		if(hitListener != null) unregisterHitListener();
 
-		wgCache = null;
 		pmgr = null;
 		instance = null;
 	}
@@ -81,8 +75,6 @@ public class SmashHit extends JavaPlugin implements Listener {
 		unregisterHitListener();
 		registerHitListener();
 	}
-
-	public WorldGuardCache getWgCache() { return wgCache; }
 
 	public boolean isListening() { return listening; }
 	public boolean isDebug() { return debugging; }
