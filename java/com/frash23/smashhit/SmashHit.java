@@ -23,6 +23,7 @@ public class SmashHit extends JavaPlugin implements Listener {
 	private static SmashHit instance;
 	private SmashHitListener hitListener = null;
 	private SmashHitDebugListener debugListener = null;
+	private WorldGuardListener wgListener = null;
 	private AsyncListenerHandler hitListenerHandler;
 	private ProtocolManager pmgr;
 
@@ -47,9 +48,9 @@ public class SmashHit extends JavaPlugin implements Listener {
 		if(hitListener == null) hitListener = new SmashHitListener(
 				this,
 				getConfig().getBoolean("enable-criticals"),
+				getConfig().getBoolean("old-criticals"),
 				getConfig().getInt("max-cps"),
-				getConfig().getDouble("max-reach"),
-				getConfig().getBoolean("use-bridge.worldguard")
+				getConfig().getDouble("max-reach")
 		);
 
 		hitListenerHandler = pmgr.getAsynchronousManager().registerAsyncHandler(hitListener);
@@ -77,6 +78,17 @@ public class SmashHit extends JavaPlugin implements Listener {
 		}
 	}
 
+	public void registerWgListener() {
+		if(wgListener == null) wgListener = new WorldGuardListener();
+		getServer().getPluginManager().registerEvents(wgListener, this);
+	}
+	public void unregisterWgListener() {
+		if(wgListener != null) {
+			HandlerList.unregisterAll(wgListener);
+			wgListener = null;
+		}
+	}
+
 	public void reload() {
 		saveDefaultConfig();
 		reloadConfig();
@@ -84,6 +96,12 @@ public class SmashHit extends JavaPlugin implements Listener {
 		if(hitListener != null) hitListener.stop();
 		unregisterHitListener();
 		registerHitListener();
+
+
+		if(getConfig().getBoolean("use-bridge.worldguard")
+		&& getServer().getPluginManager().getPlugin("WorldGuard") != null ) {
+			registerWgListener();
+		}
 	}
 
 	public boolean isListening() { return listening; }

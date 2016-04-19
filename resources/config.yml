@@ -2,6 +2,9 @@
 
 # Should criticals be enabled?
 enable-criticals: true
+# In 1.9, you can't achieve critical hits while sprinting.
+# Enable this to use pre-1.9 behavior
+old-criticals: false
 
 # How many clicks per second are we allowing?
 max-cps: 12

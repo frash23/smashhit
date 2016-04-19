@@ -3,16 +3,16 @@ package com.frash23.smashhit;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.*;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
+import com.frash23.smashhit.damageresolver.DamageResolver;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.DefaultFlag;
-import net.minecraft.server.v1_9_R1.GenericAttributes;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -26,30 +26,31 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static org.bukkit.Bukkit.getPluginManager;
+
 public class SmashHitListener extends PacketAdapter {
 	private SmashHit plugin;
 	private ProtocolManager pmgr;
-	WorldGuardPlugin worldGuard = null;
+	private DamageResolver damageResolver;
 
 	private Map<Player, Integer> cps = new HashMap<>();
 	private Queue<EntityDamageByEntityEvent> hitQueue = new ConcurrentLinkedQueue<>();
 
-	public static byte MAX_CPS;
-	public static float MAX_DISTANCE;
-	public static boolean USE_CRITICALS;
-	public static boolean BRIDGE_WORLDGUARD;
+	private static byte MAX_CPS;
+	private static float MAX_DISTANCE;
+	private static boolean BRIDGE_WORLDGUARD;
 
-	SmashHitListener(SmashHit pl, boolean useCrits, int maxCps, double maxDistance, boolean bridgeWg) {
+	SmashHitListener(SmashHit pl, boolean useCrits, boolean oldCrits, int maxCps, double maxDistance) {
 		super(pl, ListenerPriority.HIGH, Collections.singletonList( PacketType.Play.Client.USE_ENTITY) );
+
 		plugin = pl;
 		pmgr = ProtocolLibrary.getProtocolManager();
 
-		worldGuard = (WorldGuardPlugin)plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+		damageResolver = DamageResolver.getDamageResolver(useCrits, oldCrits);
+		if(damageResolver == null) throw new NullPointerException("Damage resolver is null, unsupported Spigot version?");
 
-		USE_CRITICALS = useCrits;
 		MAX_CPS = (byte)maxCps;
 		MAX_DISTANCE = (float)maxDistance * (float)maxDistance;
-		BRIDGE_WORLDGUARD = bridgeWg && worldGuard != null;
 	}
 
 	private BukkitTask hitQueueProcessor = new BukkitRunnable() {
@@ -57,7 +58,7 @@ public class SmashHitListener extends PacketAdapter {
 		public void run() {
 			while( hitQueue.size() > 0 ) {
 				EntityDamageByEntityEvent e = hitQueue.remove();
-				Bukkit.getPluginManager().callEvent(e);
+				getPluginManager().callEvent(e);
 				if( !e.isCancelled() ) {
 					Damageable target = (Damageable)e.getEntity();
 					Player attacker = (Player)e.getDamager();
@@ -93,13 +94,6 @@ public class SmashHitListener extends PacketAdapter {
 		&& world == target.getWorld() && world.getPVP() 						// Attacker & target are in the same world
 		&& attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE) {	// Distance sanity check
 
-			/* Check if WorldGuard allows us to do this */
-			if(BRIDGE_WORLDGUARD
-			&& (  !worldGuard.getRegionManager(world).getApplicableRegions(attacker.getLocation()).testState( worldGuard.wrapPlayer(attacker), DefaultFlag.PVP)
-				|| !worldGuard.getRegionManager(world).getApplicableRegions(target.getLocation()).testState( worldGuard.wrapPlayer(attacker), DefaultFlag.PVP)
-			   )
-			) return;
-
 			/* The check above ensures we can roll our own hits */
 			e.setCancelled(true);
 
@@ -110,14 +104,19 @@ public class SmashHitListener extends PacketAdapter {
 			damageAnimation.getBytes().write(0, (byte)2);
 
 			try {
-				pmgr.sendServerPacket(attacker, damageAnimation);
+				double damage = damageResolver.getDamage(attacker, target);
 
-				/* Check if attacker's CPS is within the specified maximum */
-				if(attackerCps <= MAX_CPS) {
-					double damage = ((CraftPlayer)attacker).getHandle().getAttributeInstance(GenericAttributes.ATTACK_DAMAGE).getValue();
-					if( USE_CRITICALS && !attacker.isOnGround() && attacker.getVelocity().getY() < 0 ) damage *= 1.5;
+				AsyncPreDamageEvent damageEvent = new AsyncPreDamageEvent(attacker, target, damage);
+				getPluginManager().callEvent(damageEvent);
 
-					hitQueue.add( new EntityDamageByEntityEvent(attacker, target, DamageCause.ENTITY_ATTACK, damage) );
+				if( !damageEvent.isCancelled() ) {
+
+					pmgr.sendServerPacket(attacker, damageAnimation);
+
+					/* Check if attacker's CPS is within the specified maximum */
+					if(attackerCps <= MAX_CPS) {
+						if( !damageEvent.isCancelled() )	hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
+					}
 				}
 
 			}
@@ -125,13 +124,10 @@ public class SmashHitListener extends PacketAdapter {
 		}
 	}
 
-	private double entityDistanceSquared(Entity e1, Entity e2) {
-		return e1.getLocation().distanceSquared( e2.getLocation() );
-	}
-
 	public void stop() {
 		cpsResetter.cancel();
 		hitQueueProcessor.cancel();
+		damageResolver = null;
 	}
 }
 

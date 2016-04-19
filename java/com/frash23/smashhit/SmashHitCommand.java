@@ -13,6 +13,8 @@ public class SmashHitCommand implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
+		/* You can pry the section signs from my cold, dead hands */
+
 		String subcmd = args.length < 1?  "help" : args[0];
 		switch( subcmd.toLowerCase() ) {
 			case "reload":
