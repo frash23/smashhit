@@ -7,6 +7,16 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * SmashHit - Async hit preprocessor for the Bukkit API
+ * Catches hit request packets asynchronously and processes
+ * them in an async thread
+ *
+ * @author frash23 / Jacob Pedersen
+ * @version 0.5b
+ *
+ * Licensed under <a href="https://github.com/frash23/smashhit/blob/master/LICENSE">NBPL v2</a>
+ */
 public class SmashHit extends JavaPlugin implements Listener {
 	private boolean listening = false;
 	private boolean debugging = false;

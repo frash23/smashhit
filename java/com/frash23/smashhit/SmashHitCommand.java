@@ -17,7 +17,6 @@ public class SmashHitCommand implements CommandExecutor {
 		switch( subcmd.toLowerCase() ) {
 			case "reload":
 				plugin.reload();
-				/* You can pry these section symbols from my cold, dead hands */
 				sender.sendMessage("§aSmashHit §2» §7Reloaded");
 			return true;
 
@@ -43,7 +42,7 @@ public class SmashHitCommand implements CommandExecutor {
 
 			default:
 				sender.sendMessage(new String[]{
-						"§2SmashHit §a0.5-BETA",
+						"§2SmashHit v§a0.5b",
 						"§a/bss help §7- Show this message",
 						"§a/bss reload §7- Reload config & restart hit interception",
 						"§a/bss toggle §7- Disable/enable hit interception"
