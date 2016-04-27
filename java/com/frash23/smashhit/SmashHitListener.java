@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 import com.frash23.smashhit.damageresolver.DamageResolver;
+import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
@@ -92,7 +93,8 @@ public class SmashHitListener extends PacketAdapter {
 		&&	target != null && !target.isDead()                       		// Target entity is damageable
 		&&	attackerCps < 30							                     		// We want the damage effect to show if a player
 		&& world == target.getWorld() && world.getPVP() 						// Attacker & target are in the same world
-		&& attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE) {	// Distance sanity check
+		&& attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE // Distance sanity check
+		&& (!(target instanceof Player) || ((Player) target).getGameMode() != GameMode.CREATIVE)) { // Don't hit Players in creative mode
 
 			/* The check above ensures we can roll our own hits */
 			e.setCancelled(true);
