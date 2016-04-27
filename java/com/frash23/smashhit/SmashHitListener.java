@@ -9,10 +9,9 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
 import com.frash23.smashhit.damageresolver.DamageResolver;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.sk89q.worldguard.protection.flags.DefaultFlag;
 import org.bukkit.World;
 import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -81,7 +80,8 @@ public class SmashHitListener extends PacketAdapter {
 
 		PacketContainer packet = e.getPacket();
 		Player attacker = e.getPlayer();
-		Damageable target = (Damageable)packet.getEntityModifier(e).read(0);
+		Entity entity = packet.getEntityModifier(e).read(0);
+		Damageable target = entity instanceof Damageable? (Damageable)entity : null;
 		World world = attacker.getWorld();
 
 		int attackerCps = cps.containsKey(attacker)? cps.get(attacker) : 0;
@@ -89,8 +89,8 @@ public class SmashHitListener extends PacketAdapter {
 		/* Huge if() block to verify the hit request */
 		if(e.getPacketType() == PacketType.Play.Client.USE_ENTITY			// Packet is for entity interaction
 		&& packet.getEntityUseActions().read(0) == EntityUseAction.ATTACK	// Packet is for entity damage
-		&&	packet.getEntityModifier(e).read(0) instanceof Damageable		// Target entity is damageable
-		&&	!target.isDead() && attackerCps < 30									// We want the damage effect to show if a player
+		&&	target != null && !target.isDead()                       		// Target entity is damageable
+		&&	attackerCps < 30							                     		// We want the damage effect to show if a player
 		&& world == target.getWorld() && world.getPVP() 						// Attacker & target are in the same world
 		&& attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE) {	// Distance sanity check
 
