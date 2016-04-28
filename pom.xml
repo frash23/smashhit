@@ -30,6 +30,10 @@
             <id>sk89q-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -45,11 +49,16 @@
             <version>6.1</version>
         </dependency>
         <dependency>
-            <groupId>Paper</groupId>
-            <artifactId>Paperspigot</artifactId>
-            <version>1.9.2-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>/home/jacob/documents/bukkitdev/jars/paperspigot.jar</systemPath>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.9.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
