@@ -1,0 +1,10 @@
+name: SmashHit
+version: "0.5b"
+author: "frash23"
+main: "com.frash23.smashhit.SmashHit"
+depend: [ ProtocolLib ]
+softdepend: [ WorldGuard ]
+commands:
+  smashhit:
+    aliases: [ sh ]
+    permission: smashhit.admin
