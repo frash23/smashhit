@@ -19,7 +19,7 @@
 
     <groupId>com.frash23</groupId>
     <artifactId>SmashHit</artifactId>
-    <version>0.5b</version>
+    <version>1.0-RC1</version>
 
     <repositories>
         <repository>

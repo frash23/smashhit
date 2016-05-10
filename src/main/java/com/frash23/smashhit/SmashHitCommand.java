@@ -44,7 +44,7 @@ class SmashHitCommand implements CommandExecutor {
 
 			default:
 				sender.sendMessage(new String[]{
-						"§2SmashHit v§a0.5b",
+						"§2SmashHit v§a1.0-RC1",
 						"§a/bss help §7- Show this message",
 						"§a/bss reload §7- Reload config & restart hit interception",
 						"§a/bss toggle §7- Disable/enable hit interception"

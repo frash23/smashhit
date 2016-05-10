@@ -1,5 +1,5 @@
 name: SmashHit
-version: "0.5b"
+version: "1.0-RC1"
 author: "frash23"
 main: "com.frash23.smashhit.SmashHit"
 depend: [ ProtocolLib ]
