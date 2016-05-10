@@ -33,6 +33,7 @@ public class SmashHitListener extends PacketAdapter {
 	private ProtocolManager pmgr;
 	private DamageResolver damageResolver;
 
+	private Thread instanceThread = Thread.currentThread();
 	private Map<Player, Integer> cps = new HashMap<>();
 	private Queue<EntityDamageByEntityEvent> hitQueue = new ConcurrentLinkedQueue<>();
 
@@ -58,14 +59,7 @@ public class SmashHitListener extends PacketAdapter {
 			while( hitQueue.size() > 0 ) {
 				EntityDamageByEntityEvent e = hitQueue.remove();
 				getPluginManager().callEvent(e);
-				if( !e.isCancelled() ) {
-					Damageable target = (Damageable)e.getEntity();
-					Player attacker = (Player)e.getDamager();
-					target.damage( e.getFinalDamage(), e.getDamager() );
-
-					if( cps.get(attacker) == null ) cps.put(attacker, 1);
-					else cps.put( attacker, cps.get(attacker) + 1 );
-				}
+				if( !e.isCancelled() ) ( (Damageable)e.getEntity() ).damage( e.getFinalDamage(), e.getDamager() );
 			}
 		}
 	}.runTaskTimer(SmashHit.getInstance(), 1, 1);
@@ -84,13 +78,10 @@ public class SmashHitListener extends PacketAdapter {
 		Damageable target = entity instanceof Damageable? (Damageable)entity : null;
 		World world = attacker.getWorld();
 
-		int attackerCps = cps.containsKey(attacker)? cps.get(attacker) : 0;
-
 		/* Huge if() block to verify the hit request */
 		if(e.getPacketType() == PacketType.Play.Client.USE_ENTITY			// Packet is for entity interaction
 		&& packet.getEntityUseActions().read(0) == EntityUseAction.ATTACK	// Packet is for entity damage
 		&& target != null && !target.isDead()                       		// Target entity is damageable
-		&& attackerCps < 30							                    	// We want the damage effect to show if a player
 		&& world == target.getWorld() && world.getPVP() 					// Attacker & target are in the same world
 		&& attacker.getLocation().distanceSquared( target.getLocation() ) < MAX_DISTANCE 			// Distance sanity check
 		&& (!(target instanceof Player) || ((Player) target).getGameMode() != GameMode.CREATIVE)) { // Don't hit Players in creative mode
@@ -115,9 +106,12 @@ public class SmashHitListener extends PacketAdapter {
 					pmgr.sendServerPacket(attacker, damageAnimation);
 
 					/* Check if attacker's CPS is within the specified maximum */
-					if(attackerCps <= MAX_CPS) {
-						if( !damageEvent.isCancelled() )	hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
-					}
+					int attackerCps = cps.containsKey(attacker)? cps.get(attacker) : 0;
+					cps.put( attacker, attackerCps + 1 );
+
+					/* By handling CPS this way, the recorded CPS will still increment even if the limit is reached.
+					 * This should weed out some hackers nicely */
+					if(attackerCps <= MAX_CPS) hitQueue.add( new EntityDamageByEntityEvent( attacker, target, DamageCause.ENTITY_ATTACK, damageEvent.getDamage() ) );
 				}
 
 			}
