@@ -9,7 +9,7 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-public class DamageResolver_1_7_R4 implements DamageResolver {
+class DamageResolver_1_7_R4 implements DamageResolver {
 
 	private boolean USE_CRITS, OLD_CRITS;
 

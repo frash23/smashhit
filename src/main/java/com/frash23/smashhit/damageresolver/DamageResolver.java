@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 public interface DamageResolver {
 
-	public double getDamage(Player p, Damageable entity);
+	double getDamage(Player p, Damageable entity);
 
-	public static DamageResolver getDamageResolver(boolean USE_CRITS, boolean OLD_CRITS) {
+	static DamageResolver getDamageResolver(boolean USE_CRITS, boolean OLD_CRITS) {
 		try {
 			String version = Bukkit.getServer().getClass().getPackage().getName().replace(".",  ",").split(",")[3];
 
