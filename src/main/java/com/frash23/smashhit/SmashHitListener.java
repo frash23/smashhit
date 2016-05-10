@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.bukkit.Bukkit.getPluginManager;
 
-public class SmashHitListener extends PacketAdapter {
+class SmashHitListener extends PacketAdapter {
 	private SmashHit plugin;
 	private ProtocolManager pmgr;
 	private DamageResolver damageResolver;
@@ -119,26 +119,9 @@ public class SmashHitListener extends PacketAdapter {
 		}
 	}
 
-	public void stop() {
+	void stop() {
 		cpsResetter.cancel();
 		hitQueueProcessor.cancel();
 		damageResolver = null;
 	}
 }
-
-/* --- Non-deprecated EntityDamageByEntityEvent ---
-
-In class:
-	//private final Function<? super Double, Double> ZERO = Functions.constant(-0.0);
-	//Map<DamageModifier, Function<? super Double, Double>> modFuncs = new EnumMap<>(DamageModifier.class);
-
-
-In constructor:
-	//for( DamageModifier dm : DamageModifier.values() ) modFuncs.put(dm, ZERO);
-
-In onPacketReceiving try-catch:
-	//Map<DamageModifier, Double> mods = new EnumMap<>(DamageModifier.class);
-	//for( DamageModifier dm : DamageModifier.values() ) mods.put(dm, 0D);
-	//mods.put(DamageModifier.BASE, damage);
-	//hitQueue.add( new EntityDamageByEntityEvent(attacker, target, DamageCause.ENTITY_ATTACK, mods, modFuncs) );
- */

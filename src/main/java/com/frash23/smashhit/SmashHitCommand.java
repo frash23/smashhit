@@ -4,7 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class SmashHitCommand implements CommandExecutor {
+class SmashHitCommand implements CommandExecutor {
 	private SmashHit plugin;
 
 	SmashHitCommand(SmashHit pl) {

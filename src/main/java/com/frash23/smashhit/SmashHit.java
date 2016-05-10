@@ -45,7 +45,7 @@ public class SmashHit extends JavaPlugin implements Listener {
 		instance = null;
 	}
 
-	public void registerHitListener() {
+	void registerHitListener() {
 
 		if( getHitListener() == null) {
 
@@ -70,7 +70,7 @@ public class SmashHit extends JavaPlugin implements Listener {
 		}
 	}
 
-	public void unregisterHitListener() {
+	void unregisterHitListener() {
 		if( getHitListener() != null) {
 			pmgr.getAsynchronousManager().unregisterAsyncHandler( getHitListenerHandler() );
 			listening = false;
@@ -78,12 +78,12 @@ public class SmashHit extends JavaPlugin implements Listener {
 		}
 	}
 
-	public void registerDebugListener() {
+	void registerDebugListener() {
 		if(debugListener == null) debugListener = new SmashHitDebugListener(this);
 		getServer().getPluginManager().registerEvents(debugListener, this);
 		debugging = true;
 	}
-	public void unregisterDebugListener() {
+	void unregisterDebugListener() {
 		if(debugListener != null) {
 			HandlerList.unregisterAll(debugListener);
 			debugging = false;
@@ -91,7 +91,7 @@ public class SmashHit extends JavaPlugin implements Listener {
 		}
 	}
 
-	public void registerWgListener() {
+	private void registerWgListener() {
 		if(wgListener == null) wgListener = new WorldGuardListener();
 		getServer().getPluginManager().registerEvents(wgListener, this);
 	}
@@ -102,7 +102,7 @@ public class SmashHit extends JavaPlugin implements Listener {
 		}
 	}
 
-	public void reload() {
+	void reload() {
 		saveDefaultConfig();
 		reloadConfig();
 
@@ -118,13 +118,13 @@ public class SmashHit extends JavaPlugin implements Listener {
 	}
 
 	/* These are synchronized as we're setting it from another thread */
-	public synchronized SmashHitListener getHitListener() { return hitListener; }
-	public synchronized void setHitListener(SmashHitListener hl) { hitListener = hl; }
-	public synchronized AsyncListenerHandler getHitListenerHandler() { return hitListenerHandler; }
-	public synchronized void setHitListenerHandler(AsyncListenerHandler hl) { hitListenerHandler = hl; }
+	private synchronized SmashHitListener getHitListener() { return hitListener; }
+	private synchronized void setHitListener(SmashHitListener hl) { hitListener = hl; }
+	private synchronized AsyncListenerHandler getHitListenerHandler() { return hitListenerHandler; }
+	private synchronized void setHitListenerHandler(AsyncListenerHandler hl) { hitListenerHandler = hl; }
 
-	public boolean isListening() { return listening; }
-	public boolean isDebug() { return debugging; }
+	boolean isListening() { return listening; }
+	boolean isDebug() { return debugging; }
 
-	public static SmashHit getInstance() { return instance; }
+	static SmashHit getInstance() { return instance; }
 }
