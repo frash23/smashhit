@@ -10,7 +10,7 @@ To my knowledge, there are two deficiencies:
 * Hits are processed in the current tick stack, not on demand *
 * There is a (pretty low) max clicks-per-second (aka CPS) limit hardcoded into the server
 
-<sup>* = This is the main focus of the plugin an is explained in the **What does async hit pre-processing mean?** section</sup>
+<sup>* = This is the main focus of the plugin and is explained in the **What does async hit pre-processing mean?** section</sup>
 
 The CPS limit is automatically bypassed when we process hits on our own. SmashHit's configuration allows you to set
 your own preferred CPS. The CPS limit in SmashHit will keep counting a player's CPS even if the limit is reached,
@@ -18,10 +18,10 @@ however they will be denied further hits - this way a hacker spamming clicks wil
 
 What does async hit pre-processing mean?
 ---
-The Minecraft server has a "stack" of operations to carry out, called the "tick stack". When new events have to be
+The Minecraft server has a "stack" of operations to carry out, called the "tick stack". When new operations have to be
 carried out, they are added to the tick stack. The tick stack is processed 20 times every second. That means any
 operation can unnecessarily take an additional 50ms! This can be felt by some people in PvP, which is what this plugin
-aims to solve. Some big PvP servers deploy a similar feature.
+aims to solve. Some big PvP servers already deploy a similar feature.
 
 SmashHit listens for hit requests and processes them **independent** of the tick stack! Actual damage is still
 synchronized to the Minecraft server (as damaging players isn't thread-safe), but the hit animation and hit registering
@@ -32,7 +32,7 @@ API
 ---
 Since async code works differently from regular code, we need a separate event for cancelling SmashHit's pre-processing.
 For this, the "AsyncPreDamageEvent" is provided, which you can hook into. Here is an example for cancelling hits in
-protected WorldGuard regiona:
+protected WorldGuard regions:
 ```
 class WorldGuardListener implements Listener {
 	WorldGuardPlugin wg = (WorldGuardPlugin)Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
