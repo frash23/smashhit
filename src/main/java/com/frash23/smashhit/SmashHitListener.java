@@ -33,7 +33,6 @@ class SmashHitListener extends PacketAdapter {
 	private ProtocolManager pmgr;
 	private DamageResolver damageResolver;
 
-	private Thread instanceThread = Thread.currentThread();
 	private Map<Player, Integer> cps = new HashMap<>();
 	private Queue<EntityDamageByEntityEvent> hitQueue = new ConcurrentLinkedQueue<>();
 

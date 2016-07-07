@@ -1,16 +1,16 @@
 package com.frash23.smashhit.damageresolver;
 
-import net.minecraft.server.v1_9_R1.GenericAttributes;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import net.minecraft.server.v1_9_R2.GenericAttributes;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-class DamageResolver_1_9_R1 implements DamageResolver {
+class DamageResolver_1_9_R2 implements DamageResolver {
 
 	private boolean USE_CRITS, OLD_CRITS;
 
-	DamageResolver_1_9_R1(boolean useCrits, boolean oldCrits) {
+	DamageResolver_1_9_R2(boolean useCrits, boolean oldCrits) {
 		USE_CRITS = useCrits;
 		OLD_CRITS = oldCrits;
 	}
